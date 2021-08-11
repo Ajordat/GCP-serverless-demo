@@ -1,0 +1,17 @@
+steps:
+# Build the container image
+- name: 'gcr.io/cloud-builders/docker'
+  args: ['build', '-t', 'europe-west2-docker.pkg.dev/$PROJECT_ID/fastapi/fastapi', '.']
+# Push the container image to Container Registry
+- name: 'gcr.io/cloud-builders/docker'
+  args: ['push', 'europe-west2-docker.pkg.dev/$PROJECT_ID/fastapi/fastapi']
+# Deploy container image to Cloud Run
+- name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+  entrypoint: gcloud
+  args: [
+          'run', 'deploy', 'fastapi',
+          '--image', 'europe-west2-docker.pkg.dev/$PROJECT_ID/fastapi/fastapi',
+          '--region', 'europe-west2',
+          '--platform', 'managed']
+images:
+- europe-west2-docker.pkg.dev/$PROJECT_ID/fastapi/fastapi
