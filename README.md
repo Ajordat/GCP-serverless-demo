@@ -41,11 +41,32 @@ To test the application you could use the CLI (`curl localhost:8000`) and the ap
 
 To allow the traffic, simply create a rule that applies to a tag (e.g. "allow-fastapi") that allows TCP traffic from "0.0.0.0/0" (or your public IP) to port 8000. Apply the network label to the GCE instance.
 
+We now have a working app on GCP! Yay!
+
+## Containerization
+
+Obviously the current application is very limited as it's just a VM running our application. We are missing out scalability and portability. In order to fix this, we could deploy the application to a serverless product such as Cloud Run.
+
+The first step to achieve this is to pack our application into a container so we can run the resulting image to whatever product we want (Cloud Run, GAE Flex, GKE, etc). For this purpose we have created the `Dockerfile` file. Please go read the file to understand what it does in detail.
+
+The provided file just uses a minimal Python 3.9 image, adds the source code and its dependencies, installs them and provides an entrypoint to the image.
+
+After creating that file, we can use the following command to build the container and generate the image:
+
+    docker build -t fastapi .
+
+That command just follows line by line what is mentioned on the Dockerfile and commits each change. Once all of them have been done the complete image is generated and it can be run with:
+
+    docker run -p 8000:8000 fastapi
+    
+The above command runs the image `fastapi` built according to the Dockerfile's instructions.
+
 ## TODO
 List of things I still have to explain:
 * How to deploy to Cloud Run
 * Integrate Artifact Registry
 * Deploy with Cloud Build
+* Comment the Dockerfile file
 
 [1]: https://fastapi.tiangolo.com/#create-it
 [2]: https://pypi.org/project/uvicorn/
