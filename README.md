@@ -1,7 +1,7 @@
 # GCP-serverless-demo
 
 My intention with this project is just to keep track of whatever I do while I try to integrate and communicate different GCP services.
-This is merely education and I do it for fun.
+This is merely educational and I do it for fun.
 
 ## Current products
 
