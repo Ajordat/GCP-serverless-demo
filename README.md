@@ -1,4 +1,4 @@
-# GCP-products
+# GCP-serverless-demo
 
 My intention with this project is just to keep track of whatever I do while I try to integrate and communicate different GCP services.
 This is merely education and I do it for fun.
@@ -47,7 +47,7 @@ We now have a working app on GCP! Yay!
 
 Obviously the current application is very limited as it's just a VM running our application. We are missing out scalability and portability. In order to fix this, we could deploy the application to a serverless product such as Cloud Run.
 
-The first step to achieve this is to pack our application into a container so we can run the resulting image to whatever product we want (Cloud Run, GAE Flex, GKE, etc). For this purpose we have created the `Dockerfile` file. Please go read the file to understand what it does in detail.
+The first step to achieve this is to pack our application into a container so we can run the resulting image to whatever product we want (Cloud Run, GAE Flex, GKE, etc). For this purpose we have created the `Dockerfile` file. Please go read this project's [Dockerfile][3] to understand what it does in detail.
 
 The provided file just uses a minimal Python 3.9 image, adds the source code and its dependencies, installs them and provides an entrypoint to the image.
 
@@ -59,14 +59,14 @@ That command just follows line by line what is mentioned on the Dockerfile and c
 
     docker run -p 8000:8000 fastapi
     
-The above command runs the image `fastapi` built according to the Dockerfile's instructions.
+The above command runs the image `fastapi` built according to the Dockerfile's instructions. It also maps the host's 8000 port to the container's 8000.
 
 ## TODO
 List of things I still have to explain:
 * How to deploy to Cloud Run
 * Integrate Artifact Registry
 * Deploy with Cloud Build
-* Comment the Dockerfile file
 
 [1]: https://fastapi.tiangolo.com/#create-it
 [2]: https://pypi.org/project/uvicorn/
+[3]: Dockerfile
