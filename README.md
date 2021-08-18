@@ -33,6 +33,7 @@ Basic steps to have the app running.
        python3 -m venv venv
        source venv/bin/activate
        pip install -r requirements.txt
+       
 3. At this point you can already run the application.
 
        python main.py
@@ -47,11 +48,21 @@ We now have a working app on GCP! Yay!
 
 Obviously the current application is very limited as it's just a VM running our application. We are missing out scalability and portability. In order to fix this, we could deploy the application to a serverless product such as Cloud Run.
 
-The first step to achieve this is to pack our application into a container so we can run the resulting image to whatever product we want (Cloud Run, GAE Flex, GKE, etc). For this purpose we have created the `Dockerfile` file. Please go read this project's [Dockerfile][3] to understand what it does in detail.
+To achieve this, we want to use Docker to pack our application into a container ([why Docker?][4]). With it, we can run the resulting image to whatever product we want (Cloud Run, GAE Flex, GKE, etc). For this purpose we have created the `Dockerfile` file. I want to clarify some concepts about Docker:
 
-The provided file just uses a minimal Python 3.9 image, adds the source code and its dependencies, installs them and provides an entrypoint to the image.
+1. We have a Python application that we want to end up running in a container.
+   * A Docker container is nothing more than a running instance of our application.
+2. We create the Dockerfile that will define the instruccions needed to create the minimal expression of our app.
+   * It explains how the image has to be built. It's the blueprint for building docker images.
+3. We build the Docker image by using a `docker` command.
+   * Docker will read the instructions listed on the Dockerfile one by one and commit individually each of the changes.
+   * Once all the instructions have been commited, the Docker image is complete.
+4. When the Docker image is run, it's done in a container.
+   * This can be either locally using `docker` or the image can be provided to another serverless product such as Cloud Run or GAE Flex.
 
-After creating that file, we can use the following command to build the container and generate the image:
+Please go read this project's [Dockerfile][3] to understand what it does in detail. As a sum up, the defined image starts with a minimal Python 3.9 image, adds the source code and its dependencies, installs them and provides an entrypoint to run the application.
+
+After creating the Dockerfile, we can use the following command to build the container and generate the image:
 
     docker build -t fastapi .
 
@@ -70,3 +81,4 @@ List of things I still have to explain:
 [1]: https://fastapi.tiangolo.com/#create-it
 [2]: https://pypi.org/project/uvicorn/
 [3]: Dockerfile
+[4]: https://www.docker.com/why-docker
