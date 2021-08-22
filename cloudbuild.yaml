@@ -10,14 +10,16 @@
 
 
 steps:
+
   # Use Docker to build and tag the image.
-  # Note that it's the same build command used earlier but it's using the AR's format for the tag.
 - name: 'gcr.io/cloud-builders/docker'
   args: ['build', '-t', '${_ARTIFACT_REGION}-docker.pkg.dev/$PROJECT_ID/${_ARTIFACT_REPO}/${_DOCKER_IMAGE}', '.']
-  # Push the Docker image to Artifact Registry. This way we make the image public to the rest of the team.
+  
+  # Push the Docker image to Artifact Registry. This way we publish the image to the rest of the team and Cloud Run will be able to retrieve it.
 - name: 'gcr.io/cloud-builders/docker'
   args: ['push', '${_ARTIFACT_REGION}-docker.pkg.dev/$PROJECT_ID/${_ARTIFACT_REPO}/${_DOCKER_IMAGE}']
-  # Deploy the Docker image to Cloud Run. Notice that it uses the same parameters that we were listing to deploy.
+  
+  # Deploy the Docker image to Cloud Run. Note that it uses the same parameters that we were using to deploy.
   # With Cloud Build we have managed to have all the parameters in one place and reduce the margin of error.
 - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
   entrypoint: gcloud
@@ -26,10 +28,14 @@ steps:
           '--image', '${_ARTIFACT_REGION}-docker.pkg.dev/$PROJECT_ID/${_ARTIFACT_REPO}/${_DOCKER_IMAGE}',
           '--region', '${_RUN_REGION}',
           '--platform', 'managed']
+
+# List the Docker images used. If a specified image is not produced during the build, the build will fail.
 images:
 - ${_ARTIFACT_REGION}-docker.pkg.dev/$PROJECT_ID/${_ARTIFACT_REPO}/${_DOCKER_IMAGE}
+
 # List of substitutions. When Cloud Build encounters a ${_} variable, it takes its default value from here.
 # I have abstracted the values I had and merged them all below. This has the advantage of being quite quick in changing any settings.
+# As per the $PROJECT_ID, gcloud will take the one passed to it or the one marked as default.
 substitutions:
   _ARTIFACT_REGION: europe-west2
   _RUN_REGION: europe-west2
