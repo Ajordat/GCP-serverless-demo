@@ -5,12 +5,13 @@ This is merely educational and I do it for fun.
 
 ## Current products
 
-As of now, the following products can be used by following this _guide_.
+As of now, the following products are involved following this _guide_.
 
-* Google Compute Engine (GCE).
+* Compute Engine.
 * Cloud Run.
 * Cloud Artifact Registry.
 * Cloud Build.
+* Cloud Storage (via Cloud Build).
 
 ## Requirements
 
@@ -48,7 +49,7 @@ We now have a working app on GCP! Yay!
 
 Obviously the current application is very limited as it's just a VM running our application. We are missing out scalability and portability. In order to fix this, we could deploy the application to a serverless product such as Cloud Run.
 
-To achieve this, we want to use Docker to pack our application into a container ([why Docker?][4]). With it, we can run the resulting image to whatever product we want (Cloud Run, GAE Flex, GKE, etc). For this purpose we have created the `Dockerfile` file. I want to clarify some concepts about Docker:
+To achieve this, we want to use Docker to pack our application into a container ([why Docker?][4]). With it, we can run the resulting image to whatever product we want (Cloud Run, GAE Flex, GKE, etc). For this purpose we have created the [`Dockerfile`][3] file. I want to clarify some concepts about Docker:
 
 1. We have a Python application that we want to end up running in a container.
    * A Docker container is nothing more than a running instance of our application.
@@ -101,12 +102,35 @@ At this point, the image is accessible from the created Artifact Registry reposi
 
 The above command is telling Cloud Run to take the image stored on AR and deploy it on zone "europe-west2" allowing unathorized calls. It also states that requests should be redirected to port 8000 as it's where the application is listening to.
 
+After following the steps above, we have managed to deploy the initial application into a GCP serverless product! 
+
+## Deployments with Cloud Build
+
+As we've seen, it's not difficult to understand how to deploy an application to Cloud Run. However, the process of building the image, pushing it to AR and finally deploying it can be cumbersome.
+That's because we have to issue three different commands that include creating a local Docker image and providing a many custom parameters.
+Unsurprisingly, it's not comfortable to issue the three commands on our own everytime we have to deploy. One way to mitigate this would be to write a script that does this on our behalf. Another way is to use Cloud Build.
+
+If we choose the later, Cloud Build will work by uploading the working directory to Cloud Storage and following a set of instructions that we provide. Those instructions are provided in the [`cloudbuild.yaml`][9] file.
+
+Please give the file a read to understand in detail what it does. I've also modified it a bit so it's easy to modify the variables by using Cloud Build's `substitutions` attribute. To sum up, it's just the three instructions (`docker build`, `docker push` and `gcloud run deploy`) so Cloud Build knows how to build and deploy our application.
+
+Once the [cloudbuild.yaml][9] file has been created, we can issue the following command and Cloud Build will follow our instructions:
+
+    gcloud builds submit
+    
+Thanks to this new file, we have finally managed to create an environment that allows us to deploy our Python app to Cloud Run with a single CLI instruction.
+
+### Ignoring files
+
+During the development of an app, there are many files used during the development process that are not required to build nor run the application.
+Examples of these are the "venv" or ".git" folders.
+To speed up the deployment process, we can safely tell `gcloud` to ignore those folders as they usually contain many files and can significantly slow down the initial upload done by Cloud Build.
+
+In order to ignore any folders or files we can make use of the file [`.gcloudignore`][10]. The format used borrows heavily on git's `.gitignore` [file format][11].
+
 ## TODO
-List of things I still have to explain:
+List of things I still have to do:
 * Index
-* How to deploy to Cloud Run
-* Integrate Artifact Registry
-* Deploy with Cloud Build
 * Requirements:
   * Enable APIs.
   * IAM.
@@ -126,4 +150,7 @@ List of things I still have to explain:
 [5]: https://cloud.google.com/run/docs/deploying#permissions_required_to_deploy
 [6]: https://cloud.google.com/run#all-features
 [7]: https://cloud.google.com/artifact-registry
-[8]: https://cloud.google.com/artifact-registry/docs/docker/pushing-and-pulling?hl=en#pushing
+[8]: https://cloud.google.com/artifact-registry/docs/docker/pushing-and-pulling#pushing
+[9]: cloudbuild.yaml
+[10]: .gcloudignore
+[11]: https://git-scm.com/docs/gitignore
