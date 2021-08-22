@@ -70,15 +70,60 @@ That command just follows line by line what is mentioned on the Dockerfile and c
 
     docker run -p 8000:8000 fastapi
     
-The above command runs the image `fastapi` built according to the Dockerfile's instructions. It also maps the host's 8000 port to the container's 8000.
+The above command runs the image `fastapi` built according to the Dockerfile's instructions. It also maps the host's 8000 port to the container's 8000. This means that once the container is running, we can test the app the same way we originally did, through `curl` or the UI.
+
+
+
+## Deployment to Cloud Run with Artifact Registry
+
+Now that we have managed to have a running container with our app, we should [deploy it to Cloud Run][5] so that we have all the benefits the platform provides ([why Cloud Run?][6]). The first step to do so is uploading our image to either Container Registry or Artifact Registry. After that, we will tell Cloud Run to take the image from there and deploy it.
+
+We will use [Artifact Registry][7] (AR) as it's the evolution of Container Registry. To [push to AR][8] it's needed to tag the image with a particular format and push it to the created AR repository.
+
+    docker build -t europe-west2-docker.pkg.dev/<PROJECT_ID>/fastapi/fastapi .
+
+Note that you must provide your own project ID and must be on the same project as the target Cloud Run service. Alternatively we could've tagged the image that we already have instead of building a new one (the end result is equivalent):
+
+    docker tag fastapi europe-west2-docker.pkg.dev/<PROJECT_ID>/fastapi/fastapi
+    
+Once the image is tagged we can push it to AR with the following instruction:
+
+    docker push europe-west2-docker.pkg.dev/<PROJECT_ID>/fastapi/fastapi
+
+At this point, the image is accessible from the created Artifact Registry repository on our GCP project, which means that it can be pulled by anyone with enough permissions. This time, we are going to use it to deploy to Cloud Run:
+
+    gcloud run deploy fastapi \
+        --image europe-west2-docker.pkg.dev/<PROJECT_ID>/fastapi/fastapi \
+        --platform managed \
+        --region europe-west2 \
+        --allow-unauthenticated \
+        --port=8000
+
+The above command is telling Cloud Run to take the image stored on AR and deploy it on zone "europe-west2" allowing unathorized calls. It also states that requests should be redirected to port 8000 as it's where the application is listening to.
 
 ## TODO
 List of things I still have to explain:
+* Index
 * How to deploy to Cloud Run
 * Integrate Artifact Registry
 * Deploy with Cloud Build
+* Requirements:
+  * Enable APIs.
+  * IAM.
+  * Creation of the AR repo and its auth.
+  * Environment variables
+    * Project ID
+    * Image name
+    * Zone
+    * AR repo
+
+
 
 [1]: https://fastapi.tiangolo.com/#create-it
 [2]: https://pypi.org/project/uvicorn/
 [3]: Dockerfile
 [4]: https://www.docker.com/why-docker
+[5]: https://cloud.google.com/run/docs/deploying#permissions_required_to_deploy
+[6]: https://cloud.google.com/run#all-features
+[7]: https://cloud.google.com/artifact-registry
+[8]: https://cloud.google.com/artifact-registry/docs/docker/pushing-and-pulling?hl=en#pushing
