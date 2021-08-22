@@ -6,9 +6,8 @@
 # I have moved all the hardcoded names to `substitutions`.
 # The idea is that Cloud Build will take the variables from the `substitutions` attribute if no other values have been specified.
 # More on this: https://cloud.google.com/build/docs/configuring-builds/substitute-variable-values#using_user-defined_substitutions
-# With this change any user should be able to select the region they want as well as the repositories and image names.
+# With this change any user should be able to select the region they want as well as the repositories and image names by changing those values.
 
-# TODO: TEST THESE CHANGES (env variables)
 
 steps:
   # Use Docker to build and tag the image.
@@ -29,7 +28,7 @@ steps:
           '--platform', 'managed']
 images:
 - ${_ARTIFACT_REGION}-docker.pkg.dev/$PROJECT_ID/${_ARTIFACT_REPO}/${_DOCKER_IMAGE}
-# List of substitutions. When Cloud Build encounters a ${_} variable, it takes it's default value from here.
+# List of substitutions. When Cloud Build encounters a ${_} variable, it takes its default value from here.
 # I have abstracted the values I had and merged them all below. This has the advantage of being quite quick in changing any settings.
 substitutions:
   _ARTIFACT_REGION: europe-west2
