@@ -13,6 +13,15 @@ As of now, the following products are involved following this _guide_.
 * Cloud Build.
 * Cloud Storage (via Cloud Build).
 
+##### Table of contents
+
+* [Requirements](#requirements)
+* [Initial application](#initial-application)
+* [Containerization with Docker](#containerization-with-docker)
+* [Deployment to Cloud Run with Artifact Registry](#deployment-to-cloud-run-with-artifact-registry)
+* [Deployments with Cloud Build](#deployments-with-cloud-build)
+  * [Ignoring files](#ignoring-files)
+
 ## Requirements
 
 This is just a list of the resources I start from:
@@ -24,7 +33,7 @@ This is just a list of the resources I start from:
   * I modified it a bit to use [`uvicorn`][2] and run it with a simply `python` command.
 
 
-## Initial setup
+## Initial application
 
 Basic steps to have the app running.
 
@@ -45,7 +54,7 @@ To allow the traffic, simply create a rule that applies to a tag (e.g. "allow-fa
 
 We now have a working app on GCP! Yay!
 
-## Containerization
+## Containerization with Docker
 
 Obviously the current application is very limited as it's just a VM running our application. We are missing out scalability and portability. In order to fix this, we could deploy the application to a serverless product such as Cloud Run.
 
@@ -130,7 +139,6 @@ In order to ignore any folders or files we can make use of the file [`.gcloudign
 
 ## TODO
 List of things I still have to do:
-* Index
 * Requirements:
   * Enable APIs.
   * IAM.
