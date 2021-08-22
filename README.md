@@ -3,6 +3,18 @@
 My intention with this project is just to keep track of whatever I do while I try to integrate and communicate different GCP services.
 This is merely educational and I do it for fun.
 
+#### Table of contents
+
+- [Current products](#current-products)
+- [Requirements](#requirements)
+- [Initial application](#initial-application)
+- [Containerization with Docker](#containerization-with-docker)
+- [Deployment to Cloud Run with Artifact Registry](#deployment-to-cloud-run-with-artifact-registry)
+- [Deployments with Cloud Build](#deployments-with-cloud-build)
+  * [Ignoring files](#ignoring-files)
+- [TODO](#todo)
+
+
 ## Current products
 
 As of now, the following products are involved following this _guide_.
@@ -13,14 +25,6 @@ As of now, the following products are involved following this _guide_.
 * Cloud Build.
 * Cloud Storage (via Cloud Build).
 
-##### Table of contents
-
-* [Requirements](#requirements)
-* [Initial application](#initial-application)
-* [Containerization with Docker](#containerization-with-docker)
-* [Deployment to Cloud Run with Artifact Registry](#deployment-to-cloud-run-with-artifact-registry)
-* [Deployments with Cloud Build](#deployments-with-cloud-build)
-  * [Ignoring files](#ignoring-files)
 
 ## Requirements
 
@@ -116,12 +120,12 @@ After following the steps above, we have managed to deploy the initial applicati
 ## Deployments with Cloud Build
 
 As we've seen, it's not difficult to understand how to deploy an application to Cloud Run. However, the process of building the image, pushing it to AR and finally deploying it can be cumbersome.
-That's because we have to issue three different commands that include creating a local Docker image and providing a many custom parameters.
-Unsurprisingly, it's not comfortable to issue the three commands on our own everytime we have to deploy. One way to mitigate this would be to write a script that does this on our behalf. Another way is to use Cloud Build.
+That's because we have to issue three different commands that include creating a local Docker image and providing many custom parameters.
+Unsurprisingly, it's not comfortable to issue those commands on our own everytime we have to deploy. One way to mitigate this would be to write a script that does this on our behalf. Another way is to use Cloud Build.
 
-If we choose the later, Cloud Build will work by uploading the working directory to Cloud Storage and following a set of instructions that we provide. Those instructions are provided in the [`cloudbuild.yaml`][9] file.
+Cloud Build will work by uploading the working directory to Cloud Storage and it will follow a set of instructions that we provide. Those instructions are listed in the [`cloudbuild.yaml`][9] file.
 
-Please give the file a read to understand in detail what it does. I've also modified it a bit so it's easy to modify the variables by using Cloud Build's `substitutions` attribute. To sum up, it's just the three instructions (`docker build`, `docker push` and `gcloud run deploy`) so Cloud Build knows how to build and deploy our application.
+Please give the file a read to understand in detail what it does. To sum up, it's just the three instructions (`docker build`, `docker push` and `gcloud run deploy`) so Cloud Build knows how to build and deploy our application.
 
 Once the [cloudbuild.yaml][9] file has been created, we can issue the following command and Cloud Build will follow our instructions:
 
