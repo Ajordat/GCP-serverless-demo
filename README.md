@@ -7,6 +7,7 @@ This is merely educational and I do it for fun.
 
 - [Current products](#current-products)
 - [Requirements](#requirements)
+  * [Setting up the GCE instance](#setting-up-the-gce-instance)
 - [Initial application](#initial-application)
 - [Containerization with Docker](#containerization-with-docker)
 - [Deployment to Cloud Run with Artifact Registry](#deployment-to-cloud-run-with-artifact-registry)
@@ -30,11 +31,64 @@ As of now, the following products are involved following this _guide_.
 
 This is just a list of the resources I start from:
 
-* GCE VM with Debian 9: I will use this machine as the base environment to work with the files and `gcloud`.
-  * Allow TCP traffic to port 8000.
-  * Install Docker and Python 3.
+* GCE VM with Debian 10: I will use this machine as the base environment to work with the files and `gcloud`.
+  * I explain in [the next section](#setting-up-the-gce-instance) how to configure it.
 * FastAPI's [default app][1]: I will use this as an out-of-the-box app that replies to HTTP requests.
   * I modified it a bit to use [`uvicorn`][2] and run it with a simply `python` command.
+
+### Setting up the GCE instance
+
+To work with the command line I have used a GCE instance. The following is just the configuration I used but feel free to use your own custom environment:
+
+* Machine type: **e2-micro** ([Monthly free instance][12]).
+* Disk image: **Debian 10**.
+* Firewall: **Allow HTTP traffic**.
+* Service Account: **Compute Engine default service account**.
+* Access scopes: **Allow default access**.
+
+1. Update Debian's package manager.
+
+       sudo apt update
+       sudo apt upgrade
+
+2. Install Docker. Just follow the [official documentation][13], but these are the instructions I followed:
+   ```
+   sudo apt-get install -y apt-transport-https ca-certificates curl gnupg lsb-release
+   
+   curl -fsSL https://download.docker.com/linux/debian/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
+   echo "deb [arch=amd64 signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/debian \
+     $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+   sudo apt-get update
+   sudo apt-get install docker-ce docker-ce-cli containerd.io
+   ```
+3. Python3 should already be installed, but we will need its package manager and the ability to create virtual environments:
+
+       sudo apt install -y python3-pip python3-venv
+
+
+
+5. Optional. Create a [firewall rule][14] tag to attach to the GCE instance. This rule will allow incoming traffic to the port 8000, which is what we will be using. This is not necessary as it will just allow us to access the application remotely.
+
+       gcloud compute firewall-rules create fastapi-allow \
+           --network=default \
+           --priority=1000 \
+           --direction=INGRESS \
+           --action=ALLOW \
+           --target-tags=fastapi-allow \
+           --source-ranges=0.0.0.0/0 \
+           --rules=tcp:8000 \
+           --no-disabled \
+           --no-enable-logging
+
+        gcloud compute instances add-tags $HOSTNAME --tags=fastapi-allow
+           
+   My target with this repository is precisely not having to run the application on GCE, but I think this last step emphasizes that there's no magic on this other than just a remote VM serving traffic.
+
+After following the above steps, the GCE instance has now all the tools it needs. It's possible to verify it by printing the installed tools' versions.
+
+    docker --version
+    python3 --version
+    pip3 --version
 
 
 ## Initial application
@@ -50,11 +104,9 @@ Basic steps to have the app running.
        
 3. At this point you can already run the application.
 
-       python main.py
+       python src/main.py
        
-To test the application you could use the CLI (`curl localhost:8000`) and the app will respond. It's also possible to use the VM's public IP if it is allowed at the instance's firewall (not by default) or the default port is changed at the application level.
-
-To allow the traffic, simply create a rule that applies to a tag (e.g. "allow-fastapi") that allows TCP traffic from "0.0.0.0/0" (or your public IP) to port 8000. Apply the network label to the GCE instance.
+To test the application you could use the CLI (`curl localhost:8000`) and the app will respond. It's also possible to use the VM's public IP if it is allowed at the instance's firewall (as explained in [step 5](#setting-up-the-gce-instance)) or the default port is changed at the application level. Note that it will only reply to HTTP, not HTTPS.
 
 We now have a working app on GCP! Yay!
 
@@ -166,3 +218,6 @@ List of things I still have to do:
 [9]: cloudbuild.yaml
 [10]: .gcloudignore
 [11]: https://git-scm.com/docs/gitignore
+[12]: https://cloud.google.com/free/docs/gcp-free-tier/#compute
+[13]: https://docs.docker.com/engine/install/debian/
+[14]: https://cloud.google.com/vpc/docs/firewalls
