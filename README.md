@@ -5,13 +5,18 @@ This is merely educational and I do it for fun.
 
 #### Table of contents
 
+
 - [Current products](#current-products)
 - [Requirements](#requirements)
   * [Setting up the GCE instance](#setting-up-the-gce-instance)
 - [Initial application](#initial-application)
 - [Containerization with Docker](#containerization-with-docker)
-- [Deployment to Cloud Run with Artifact Registry](#deployment-to-cloud-run-with-artifact-registry)
-- [Deployments with Cloud Build](#deployments-with-cloud-build)
+- [Integration with Artifact registry](#integration-with-artifact-registry)
+  * [Requirements](#requirements-1)
+  * [Deployment to Cloud Run from Artifact Registry](#deployment-to-cloud-run-from-artifact-registry)
+- [Integration with Cloud Build](#integration-with-cloud-build)
+  * [Requirements](#requirements-2)
+  * [Deployments with Cloud Build](#deployments-with-cloud-build)
   * [Ignoring files](#ignoring-files)
 - [TODO](#todo)
 
@@ -255,7 +260,6 @@ List of things I still have to do:
     * Image name
     * Zone
     * AR repo: $AR_REPOSITORY
-* Fix the table of contents
 * Double check that all the IAM, APIs and docker authorization is working.
 
 
