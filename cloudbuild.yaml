@@ -27,7 +27,8 @@ steps:
           'run', 'deploy', '${_RUN_SERVICE}',
           '--image', '${_ARTIFACT_REGION}-docker.pkg.dev/$PROJECT_ID/${_ARTIFACT_REPO}/${_DOCKER_IMAGE}',
           '--region', '${_RUN_REGION}',
-          '--platform', 'managed']
+          '--platform', 'managed',
+          '--port=8000']
 
 # List the Docker images used. If a specified image is not produced during the build, the build will fail.
 images:
