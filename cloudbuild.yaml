@@ -40,5 +40,5 @@ substitutions:
   _ARTIFACT_REGION: europe-west2
   _RUN_REGION: europe-west2
   _RUN_SERVICE: fastapi
-  _ARTIFACT_REPO: fastapi
+  _ARTIFACT_REPO: fastapi-repository
   _DOCKER_IMAGE: fastapi
